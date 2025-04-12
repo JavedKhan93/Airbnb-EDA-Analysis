@@ -1,0 +1,145 @@
+#Task 1: Importing All Dependencies
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+#Task 2: Loading Dataset
+data = pd.read_csv("C:\\Users\\Javed\\Downloads\\air&b.csv")
+
+#Task 3: Initial Exploration
+print(data.head())
+print(data.tail())
+print("Shape of Dataset:", data.shape)
+print(data.info())
+print(data.describe())
+
+
+#Task 4: Data Cleaning
+
+print("Missing values:\n", data.isnull().sum())
+
+data.dropna(inplace=True)
+
+print("Missing values after drop:\n", data.isnull().sum())
+
+print("Duplicate Rows:", data.duplicated().sum())
+data.drop_duplicates(inplace=True)
+print("Duplicate Rows after drop:", data.duplicated().sum())
+
+data['id'] = data['id'].astype(object)
+data['host_id'] = data['host_id'].astype(object)
+
+print(data.dtypes)
+
+#Task 5: Data Analysis(EDA)
+# idenfying outliers in price
+
+df = data[data['price'] < 1500]
+sns.boxplot(data=df, x= 'price')
+plt.show()
+
+
+#Price distribuion
+plt.figure(figsize=(8, 5))
+sns.histplot(data=df, x= 'price' , bins=100)
+plt.title('Price Distribuition')
+plt.ylabel("Frequency")
+plt.show()
+df.dtypes
+print(df)
+
+#Price distribuion
+plt.figure(figsize=(6, 3))
+sns.histplot(data=df, x='availability_365')
+plt.title('availability_365 Distribuition')
+plt.ylabel("Frequency")
+plt.show()
+data.dtypes
+print(data)
+
+
+#By Variable Analysis One variable depenency in another variable
+df.columns
+print(df)
+'''Index(['id', 'name', 'host_id', 'host_name', 'neighbourhood_group',
+       'neighbourhood', 'latitude', 'longitude', 'room_type', 'price',
+       'minimum_nights', 'number_of_reviews', 'last_review',
+       'reviews_per_month', 'calculated_host_listings_count',
+       'availability_365', 'number_of_reviews_ltm', 'license', 'rating',
+       'bedrooms', 'beds', 'baths', 'price per bed'],
+      dtype='object')'''
+sns.barplot(data=df, x='neighbourhood_group', y='price', hue='room_type')
+plt.show()
+
+
+#Line Graph – Number of Listings per Room Type Over Time
+df['last_review'] = pd.to_datetime(df['last_review'], errors='coerce')
+room_type_trend = df.dropna(subset=['last_review']).groupby(
+    [pd.Grouper(key='last_review', freq='M'), 'room_type']
+).size().unstack()
+plt.figure(figsize=(12, 6))
+room_type_trend.plot(marker='o', linewidth=2)
+plt.title('Monthly Trend of Listings by Room Type', fontsize=14)
+plt.xlabel('Month')
+plt.ylabel('Number of Listings')
+plt.grid(True)
+plt.legend(title='Room Type')
+plt.tight_layout()
+plt.show()
+
+
+#average price per bed
+df = df[df['beds'] > 0]
+df['price per bed'] = df['price'] / df['beds']
+print(df)
+
+avg_price_by_room = df.groupby('room_type')['price'].mean().sort_values()
+
+plt.figure(figsize=(8, 4))
+sns.barplot(x=avg_price_by_room.values, y=avg_price_by_room.index, palette='magma')
+
+plt.title('Average Price by Room Type')
+plt.xlabel('Average Price')
+plt.ylabel('Room Type')
+plt.tight_layout()
+plt.show()
+
+#Scatter Plot: Number of Reviews vs Price (Color-coded by Neighbourhood Group)
+plt.figure(figsize=(8, 5))
+plt.title("Impact of Reviews on Price Across Neighbourhoods", fontsize=14)
+sns.scatterplot(data=df, x='number_of_reviews', y='price', hue='neighbourhood_group')
+plt.xlabel("Number of Reviews")
+plt.ylabel("Price (in USD)")
+plt.legend(title='Neighbourhood Group')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+#Pairplot: Exploring Numerical Feature Relationships by Room Type
+print(df.dtypes)  
+
+sns.pairplot(data=df, vars=['price', 'minimum_nights', 'number_of_reviews', 'availability_365'], hue='room_type')
+plt.show()
+
+#Geographical Spread of Airbnb Listings by Room Type
+plt.figure(figsize=(10, 7))
+sns.scatterplot(data=df, x='longitude', y='latitude', hue='room_type', alpha=0.6, palette='Set2')
+
+plt.title("Spatial Distribution of Airbnb Listings by Room Type", fontsize=14)
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+#Heatmap: Correlation of one variable with others for numerical column
+corr = df[['latitude', 'longitude', 'price', 'minimum_nights',
+           'number_of_reviews', 'reviews_per_month',
+           'availability_365', 'beds']].corr()
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(data=corr, annot=True, cmap='magma', fmt=".2f", linewidths=0.5)
+
+plt.title("Heatmap: Correlation of Numerical Airbnb Features", fontsize=14)
+plt.tight_layout()
+plt.show()
