@@ -40,7 +40,6 @@ plt.show()
 
 # Pie Chart: Distribution of Listings by Room Type
 room_type_counts = df['room_type'].value_counts()
-
 plt.figure(figsize=(7, 7))
 plt.pie(room_type_counts, labels=room_type_counts.index, autopct='%1.1f%%', startangle=140, colors=sns.color_palette('pastel'))
 plt.title('Distribution of Listings by Room Type', fontsize=14)
