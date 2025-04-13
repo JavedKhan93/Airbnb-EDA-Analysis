@@ -38,6 +38,15 @@ df = data[data['price'] < 1500]
 sns.boxplot(data=df, x= 'price')
 plt.show()
 
+# Pie Chart: Distribution of Listings by Room Type
+room_type_counts = df['room_type'].value_counts()
+
+plt.figure(figsize=(7, 7))
+plt.pie(room_type_counts, labels=room_type_counts.index, autopct='%1.1f%%', startangle=140, colors=sns.color_palette('pastel'))
+plt.title('Distribution of Listings by Room Type', fontsize=14)
+plt.axis('equal')  # Equal aspect ratio ensures pie chart is circular
+plt.tight_layout()
+plt.show()
 
 #Price distribuion
 plt.figure(figsize=(8, 5))
