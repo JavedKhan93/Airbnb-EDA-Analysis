@@ -79,6 +79,51 @@ print(df)
 sns.barplot(data=df, x='neighbourhood_group', y='price', hue='room_type')
 plt.show()
 
+# airbnb_price_predictor.py
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
+import joblib
+
+# Load the dataset
+df = pd.read_csv('AB_NYC_2024.csv')
+
+# Drop unnecessary columns
+df = df[['neighbourhood_group', 'room_type', 'minimum_nights', 'number_of_reviews', 'availability_365', 'price']]
+
+# Drop rows with missing values
+df.dropna(inplace=True)
+
+# Remove outliers
+df = df[df['price'] < 1000]  # Keeping listings below $1000
+
+# One-hot encode categorical features
+df = pd.get_dummies(df, columns=['neighbourhood_group', 'room_type'], drop_first=True)
+
+# Features and target
+X = df.drop('price', axis=1)
+y = df['price']
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model training
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Predictions
+y_pred = model.predict(X_test)
+
+# Evaluation
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Model Performance:\nMAE: {mae:.2f}\nR² Score: {r2:.2f}")
+
+# Save the model
+joblib.dump(model, 'airbnb_price_model.pkl')
 
 #Line Graph – Number of Listings per Room Type Over Time
 df['last_review'] = pd.to_datetime(df['last_review'], errors='coerce')
