@@ -78,7 +78,6 @@ print(df)
       dtype='object')'''
 sns.barplot(data=df, x='neighbourhood_group', y='price', hue='room_type')
 plt.show()
-
 # airbnb_price_predictor.py
 
 import pandas as pd
