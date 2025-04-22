@@ -65,7 +65,6 @@ plt.show()
 data.dtypes
 print(data)
 
-
 #By Variable Analysis One variable depenency in another variable
 df.columns
 print(df)
