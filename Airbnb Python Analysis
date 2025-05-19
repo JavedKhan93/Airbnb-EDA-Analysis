@@ -38,14 +38,6 @@ df = data[data['price'] < 1500]
 sns.boxplot(data=df, x= 'price')
 plt.show()
 
-# Pie Chart: Distribution of Listings by Room Type
-room_type_counts = df['room_type'].value_counts()
-plt.figure(figsize=(7, 7))
-plt.pie(room_type_counts, labels=room_type_counts.index, autopct='%1.1f%%', startangle=140, colors=sns.color_palette('pastel'))
-plt.title('Distribution of Listings by Room Type', fontsize=14)
-plt.axis('equal')  # Equal aspect ratio ensures pie chart is circular
-plt.tight_layout()
-plt.show()
 
 #Price distribuion
 plt.figure(figsize=(8, 5))
@@ -65,6 +57,7 @@ plt.show()
 data.dtypes
 print(data)
 
+
 #By Variable Analysis One variable depenency in another variable
 df.columns
 print(df)
@@ -76,83 +69,6 @@ print(df)
        'bedrooms', 'beds', 'baths', 'price per bed'],
       dtype='object')'''
 sns.barplot(data=df, x='neighbourhood_group', y='price', hue='room_type')
-plt.show()
-# airbnb_price_predictor.py
-
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, r2_score
-import joblib
-
-# Load the dataset
-df = pd.read_csv('AB_NYC_2024.csv')
-
-# Drop unnecessary columns
-df = df[['neighbourhood_group', 'room_type', 'minimum_nights', 'number_of_reviews', 'availability_365', 'price']]
-
-# Drop rows with missing values
-df.dropna(inplace=True)
-
-# Remove outliers
-df = df[df['price'] < 1000]  # Keeping listings below $1000
-
-# One-hot encode categorical features
-df = pd.get_dummies(df, columns=['neighbourhood_group', 'room_type'], drop_first=True)
-
-# Features and target
-X = df.drop('price', axis=1)
-y = df['price']
-
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Model training
-model = RandomForestRegressor(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-
-# Predictions
-y_pred = model.predict(X_test)
-
-# Evaluation
-mae = mean_absolute_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
-
-print(f"Model Performance:\nMAE: {mae:.2f}\nR² Score: {r2:.2f}")
-
-# Save the model
-joblib.dump(model, 'airbnb_price_model.pkl')
-
-#Line Graph – Number of Listings per Room Type Over Time
-df['last_review'] = pd.to_datetime(df['last_review'], errors='coerce')
-room_type_trend = df.dropna(subset=['last_review']).groupby(
-    [pd.Grouper(key='last_review', freq='M'), 'room_type']
-).size().unstack()
-plt.figure(figsize=(12, 6))
-room_type_trend.plot(marker='o', linewidth=2)
-plt.title('Monthly Trend of Listings by Room Type', fontsize=14)
-plt.xlabel('Month')
-plt.ylabel('Number of Listings')
-plt.grid(True)
-plt.legend(title='Room Type')
-plt.tight_layout()
-plt.show()
-
-
-#average price per bed
-df = df[df['beds'] > 0]
-df['price per bed'] = df['price'] / df['beds']
-print(df)
-
-avg_price_by_room = df.groupby('room_type')['price'].mean().sort_values()
-
-plt.figure(figsize=(8, 4))
-sns.barplot(x=avg_price_by_room.values, y=avg_price_by_room.index, palette='magma')
-
-plt.title('Average Price by Room Type')
-plt.xlabel('Average Price')
-plt.ylabel('Room Type')
-plt.tight_layout()
 plt.show()
 
 #Scatter Plot: Number of Reviews vs Price (Color-coded by Neighbourhood Group)
